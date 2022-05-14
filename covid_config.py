@@ -6,8 +6,8 @@ from typing import List
 class PluginConfig(BaseModel):
 
     enable_group: List[int] = []
-    api_key = '9cb50f042fbfa22fb2387a3466266d7b'
-    api_id = '17312'
+    api_key = ''
+    api_id = ''
 
 
 driver = get_driver()
