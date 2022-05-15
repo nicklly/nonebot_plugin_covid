@@ -1,4 +1,4 @@
-# nonebot2_covid_plugin
+# nonebot2_plugin_covid
 查询国内新冠疫情
 
 <div align="center">
