@@ -3,7 +3,8 @@
 
 <div align="center">
 
-# 新冠肺炎疫情查询（仅限国内各省市及地级市）
+# 新冠肺炎疫情数据查询
+（支持国内各省市及地级市、海外国家）
 
 </div>
 
@@ -24,9 +25,22 @@ v0.0.1
 
 `nb plugin install nonebot_plugin_covid`
 
+###配置
+根据.env里的ENVIRONMENT配置项自行选择.env.dev或.env.prod<br>
+然后添加 WAPI_ID和WAPI_KEY两项配置<br>
+如:<br>
+`WAPI_ID='''`<br>
+`WAPI_KEY=''`
+
+注: key加密默认方式为<font color='red'>Hash</font>，具体请自行查阅API文档
+
 ## 功能
 
-查询国内疫情数据
+查询 国内/海外 疫情数据
+
+注：因部分海外国家列出了下属城市的疫情数据，由于篇幅过长可能导致查阅困难<br>
+默认covid_config.py里的`enable_country_covid19_data=False`<br>
+如需打开请自行设置`enable_country_covid19_data=True`
 
 ## 命令
 
@@ -34,7 +48,7 @@ v0.0.1
 
 
 ### 需要参数：
-city 城市及省份列表参考city_list.py
+<city> 国家、城市、省份请自行参考city_list.py
 
 
 ### 使用注意
