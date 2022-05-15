@@ -53,3 +53,14 @@ v0.0.1
 
 ### 使用注意
 使用第三方提供API 需要自行到<a href="https://www.wapi.cn/">点击这里</a>申请appid和key 
+
+
+### 功能演示
+海外国家查询：
+<img src='https://github.com/nicklly/nonebot2_plugin_covid/blob/main/img/QQ%E6%88%AA%E5%9B%BE20220515152720.png?raw=true'>
+
+国内城市查询：
+<img src='https://github.com/nicklly/nonebot2_plugin_covid/blob/main/img/QQ%E6%88%AA%E5%9B%BE20220515152751.png?raw=true'>
+
+国内省份查询：
+<img src='https://github.com/nicklly/nonebot2_plugin_covid/blob/main/img/QQ%E6%88%AA%E5%9B%BE20220515152737.png?raw=true'>
