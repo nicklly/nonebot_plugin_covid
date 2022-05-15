@@ -1,6 +1,8 @@
 import logging
 import re
 import time
+
+import nonebot
 import requests
 import datetime
 
@@ -11,7 +13,8 @@ from nonebot.matcher import Matcher
 from nonebot import on_command
 from nonebot.params import Arg, CommandArg, ArgPlainText
 from .covid_config import config
-from .city_list import city_list, province_list
+from .city_list import city_list, province_list, country_list
+from .util.common import get_covid_china_info, get_covid_global_info
 
 covid = on_command('covid', aliases={'新冠', '疫情', 'covid'}, priority=5)
 r = requests.session()
@@ -30,9 +33,9 @@ async def _(event: Union[GroupMessageEvent, MessageEvent], city: str = ArgPlainT
     if re.match(r'.*CQ:.*', city):
         return
     else:
-        if city in city_list or city in province_list:
+        if city in city_list or city in province_list or city in country_list:
             try:
-                res = await get_covid_info(escape(city))
+                res = await get_covid_china_info(escape(city))
                 if res['codeid'] != 10000:
                     await covid.finish(res['message'])
                 result = res['retdata']
@@ -95,26 +98,42 @@ async def _(event: Union[GroupMessageEvent, MessageEvent], city: str = ArgPlainT
                 if result['dangerousAreas']['moreUrl']:
                     message += "\n"
                     message += "如要查阅详细的风险地区, 请到: {0} 查询".format(result['dangerousAreas']['moreUrl'])
+
+                """
+                查询海外疫情数据 仅部分国家支持显示下属城市
+                """
+            elif city in country_list:
+                try:
+                    res = await get_covid_global_info()
+                    if res['codeid'] != 10000:
+                        await covid.finish(res['message'])
+                    result = res['retdata']
+                except TypeError as e:
+                    await covid.finish(f'程序出错:{e}')
+
+                for i in range(len(result)):
+                    """
+                    匹配海外国家
+                    """
+                    rematch = re.match(city, result[i]['xArea'])
+                    subList = result[i]['subList']
+
+                    if rematch:
+                        if rematch.group() == result[i]['xArea']:
+                            updateTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(result[i]['relativeTime'])))
+                            message += '当前查询: {0}\n' \
+                                       '{0}累计确诊: {1}例, 治愈:{2}例, 死亡: {3}例\n' \
+                                       '截止到 {5}, {0}新增: {4}例'.format(result[i]['xArea'], result[i]['confirm'],
+                                                                     result[i]['heal'], result[i]['died'],
+                                                                     result[i]['curConfirm'], updateTime)
+                            if config.enable_country_covid19_data:
+                                if len(subList) > 0:
+                                    message += '\n\n{0}的主要城市疫情数据:\n'.format(result[i]['xArea'])
+                                    for n in range(len(subList)):
+                                        message += '{0}: 确诊: {1}例, 死亡: {2}例, 治愈: {3}例, 治愈率: {4}, 死亡率: {5}\n'.format(
+                                            subList[n]['city'], subList[n]['confirm'], subList[n]['died'],
+                                            subList[n]['heal'], subList[n]['curedPercent'], subList[n]['diedPercent'])
+
             await covid.finish(message)
         else:
             await covid.finish(f"您所输入的 {city} 暂不支持查询, 请重新输入")
-
-
-async def get_covid_info(city: str):
-    time = datetime.datetime.now().timestamp()
-    header = {}
-    param = {
-        'format': 'json',
-        'appid': config.api_id,
-        'sign': config.api_key,
-        'time': time,
-        'city_name': city
-    }
-    try:
-        req = r.get("https://giea.api.storeapi.net/api/94/221", headers=header, params=param)
-        res = req.json()
-        if res['codeid'] == 10000:
-            return res
-        return res
-    except requests.exceptions.RequestException as e:
-        logging.error(e)
