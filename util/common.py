@@ -1,10 +1,8 @@
 import datetime
 import logging
 
-import requests
-from ..covid_config import config
-
-r = requests.session()
+from .covid_config import config
+from ..util import aiorequest
 
 
 async def get_covid_china_info(city: str):
@@ -18,12 +16,12 @@ async def get_covid_china_info(city: str):
         'city_name': city
     }
     try:
-        req = r.get("https://giea.api.storeapi.net/api/94/221", headers=header, params=param)
+        req = await aiorequest.get(url="https://giea.api.storeapi.net/api/94/221", headers=header, params=param)
         res = req.json()
         if res['codeid'] == 10000:
             return res
         return res
-    except requests.exceptions.RequestException as e:
+    except Exception as e:
         logging.error(e)
 
 
@@ -37,10 +35,10 @@ async def get_covid_global_info():
         'time': time,
     }
     try:
-        req = r.get("https://giea.api.storeapi.net/api/94/220", headers=header, params=param)
+        req = await aiorequest.get("https://giea.api.storeapi.net/api/94/220", headers=header, params=param)
         res = req.json()
         if res['codeid'] == 10000:
             return res
         return res
-    except requests.exceptions.RequestException as e:
+    except Exception as e:
         logging.error(e)
