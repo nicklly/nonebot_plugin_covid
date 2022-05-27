@@ -25,7 +25,7 @@ v0.0.1
 
 `nb plugin install nonebot_plugin_covid`
 
-###配置
+## 配置
 根据.env里的ENVIRONMENT配置项自行选择.env.dev或.env.prod<br>
 然后添加 WAPI_ID和WAPI_KEY两项配置<br>
 如:<br>
